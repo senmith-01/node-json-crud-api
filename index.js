@@ -18,8 +18,10 @@ function writeData(data) {
 const server = http.createServer((req,resp)=>{
     resp.setHeader('Content-Type','application/json');
 
-    if(req.method=='GET'){
-        resp.end('GET');
+    if(req.method=='GET' && req.url=='/data'){
+        const data = readData();
+        resp.writeHead(200);
+        resp.end(JSON.stringify(data));
     }else if(req.method=='POST'){
         resp.end('POST');
     }else if(req.method=='DELETE'){
