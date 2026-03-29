@@ -11,7 +11,7 @@ function readData() {
         return [];
     }
 }
-function writeData() {
+function writeData(data) {
     fs.writeFileSync(DATA_FILE, JSON.stringify(data,null,2));
 }
 
@@ -25,7 +25,7 @@ const server = http.createServer((req,resp)=>{
     }else if(req.method=='DELETE'){
         resp.end('DELETE');
     }else if(req.method=='PUT'){
-        resp.end('PUTT');
+        resp.end('PUT');
     }
 })
 
