@@ -22,12 +22,42 @@ const server = http.createServer((req,resp)=>{
         const data = readData();
         resp.writeHead(200);
         resp.end(JSON.stringify(data));
-    }else if(req.method=='POST'){
-        resp.end('POST');
-    }else if(req.method=='DELETE'){
-        resp.end('DELETE');
-    }else if(req.method=='PUT'){
-        resp.end('PUT');
+    }else if(req.method=='POST' && req.url=='/data'){
+        let body="";
+        req.on("data", chunck=> body +=chunck);
+        req.on("end", ()=>{
+            const newItem=JSON.parse(body);
+            writeData(newItem);
+        })
+        resp.end('Data Saved');
+    }else if (req.method == 'DELETE' && req.url.startsWith('/data/')) {
+        const id = parseInt(req.url.split('/')[2]);  // e.g. /data/0
+        const data = readData();
+        if (id >= 0 && id < data.length) {
+            data.splice(id, 1);          // removes item at that index
+            writeData(data);
+            resp.writeHead(200);
+            resp.end(JSON.stringify({ message: 'Data Deleted' }));
+        } else {
+            resp.writeHead(404);
+            resp.end(JSON.stringify({ message: 'Item not found' }));
+        }
+    } else if (req.method == 'PUT' && req.url.startsWith('/data/')) {
+        const id = parseInt(req.url.split('/')[2]);  // e.g. /data/0
+        let body = "";
+        req.on("data", chunk => body += chunk);
+        req.on("end", () => {
+            const data = readData();
+            if (id >= 0 && id < data.length) {
+                data[id] = JSON.parse(body);  // replaces item at that index
+                writeData(data);
+                resp.writeHead(200);
+                resp.end(JSON.stringify({ message: 'Data Updated' }));
+            } else {
+                resp.writeHead(404);
+                resp.end(JSON.stringify({ message: 'Item not found' }));
+            }
+        });
     }
 })
 
